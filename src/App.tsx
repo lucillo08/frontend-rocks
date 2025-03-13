@@ -9,19 +9,38 @@ interface PokemonCard {
   type: string[];
 }
  
-async function fetchData(): Promise<string[]> {
+async function fetchData(): Promise<PokemonCard[]> {
+  
   const data = await PokeAPI.getPokemonsList();
-  return data.results.map(item => item.name);
 
+  const pokemon = await PokeAPI.getPokemonByName(data.results[0].name);
+  const pokemons = await Promise.all(data.results.map((pokemon) => {
+    return PokeAPI.getPokemonByName(pokemon.name);
+  }));
+  return pokemons.map((pokemon) => {
+    return {
+  id:pokemon.id,
+  name: pokemon.name,
+  image: pokemon.sprites.other["official-artwork"].front_shiny ?? "",
+  type: pokemon.types.map((t) => t.type.name),
+}});
 }
 
-const data = await fetchData
+
 
 const typeColors: { [key: string]: string } = {
-  fire : "bg-red-500",
+  fire: "bg-red-500",
   water: "bg-blue-500",
-  fly: "bg-grey-500",
-  dragon: "bg-orange-500",
+  grass: "bg-green-500",
+  poison: "bg-purple-500",
+  bug: "bg-green-500",
+  normal: "bg-gray-500",
+  dragon: "bg-purple-700",
+  steel: "bg-gray-700",
+  flying: "bg-indigo-400",
+  rock: "bg-yellow-700",
+  ground: "bg-yellow-500",
+
 };
 function getTypeColor(type: string) {
   const color = typeColors[type];
@@ -30,6 +49,7 @@ function getTypeColor(type: string) {
 
 const Card = (props: PokemonCard) => {
  return (
+  <div className="border p-5 m-7 bg-white rounded-lg shadow-md w-60 text-center">
   <div>
               {props.id} - {props.name}
               <img src={props.image} alt={props.name} />
@@ -38,6 +58,7 @@ const Card = (props: PokemonCard) => {
                   return <div className={`p-4 ${getTypeColor(type) }`}>{type}</div>;
                 })}
               </div>
+            </div>
             </div>
  )
 }
@@ -48,10 +69,10 @@ export const App = () => {
     fetchData().then((results) => {
       setData (
         results.map((item) => ({
-          id: 1,
-          name: item,
-          image: item,
-          type: [item],
+          id: item.id,
+          name: item.name,
+          image: item.image,
+          type: item.type,
           }))
       );
     });
