@@ -1,5 +1,5 @@
 //sito di luca pirovano
-import { Await } from "react-router";
+
 import { PokeAPI } from "./pokeapiClient";
 import { useEffect, useState } from "react"
 
