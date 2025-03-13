@@ -1,52 +1,86 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Await } from "react-router";
+import { PokeAPI } from "./pokeapiClient";
+import { useEffect, useState } from "react"
 
- export const Detail = () => {
-  const { id } = useParams();
-  return <div>barbabraus:{id}</div>
- }
+interface PokemonCard {
+  id: number;
+  image: string;
+  name: string;
+  type: string[];
+}
+ 
+async function fetchData(): Promise<string[]> {
+  const data = await PokeAPI.getPokemonsList();
+  return data.results.map(item => item.name);
+
+}
+
+const data = await fetchData
+
+const typeColors: { [key: string]: string } = {
+  fire : "bg-red-500",
+  water: "bg-blue-500",
+  fly: "bg-grey-500",
+  dragon: "bg-orange-500",
+};
+function getTypeColor(type: string) {
+  const color = typeColors[type];
+  return color;
+}
+
+const Card = (props: PokemonCard) => {
+ return (
+  <div>
+              {props.id} - {props.name}
+              <img src={props.image} alt={props.name} />
+              <div className="flex flex-wrap">
+                {props.type.map((type) => {
+                  return <div className={`p-4 ${getTypeColor(type) }`}>{type}</div>;
+                })}
+              </div>
+            </div>
+ )
+}
 export const App = () => {
-  const [count, setCount] = useState(0);
-  const [title, setTitle] = useState("barbara");
-
+  const [data, setData] = useState<PokemonCard[]>([]);
+  
   useEffect(() => {
-    if (count === 4) {
-      setTitle("4 barbarelle")
-    }
-  },[count])
+    fetchData().then((results) => {
+      setData (
+        results.map((item) => ({
+          id: 1,
+          name: item,
+          image: item,
+          type: [item],
+          }))
+      );
+    });
 
+  
+
+  }, []);
+  
   return (
-    <div className="h-dvh flex flex-col items-center justify-center">
-      <div className="bg-white p-8 rounded-md shadow-lg">
-        <h1 className="text-center font-bold text-3xl text-blue-400 mb-4">
-          {title}
-        </h1>
-
-        <h2 className="text-center font-bold text-xl mb-6">Vite + React</h2>
-
-        <div className="flex flex-col items-center space-y-4">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md cursor-pointer hover:bg-blue-600 transition-colors"
-            onClick={() => setCount((count) => count + 4)}
-          >
-            Hai premuto il pulsante {count} {count === 1 ? "volta" : "volte"}
-          </button>
-
-          <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md cursor-pointer hover:bg-blue-600 transition-colors"
-              onClick={() => setTitle("MEGA barbara")}
-          >
-            Cambia
+    <div>
+      <div className="flex flex-wrap bg-white grid grid-cols-4">
+        {data.map((item) => {
+          return <Card
+          id={item.id}
+          name={item.name}
+          image={item.image}
+          type={item.type}
+          />
             
-          </button>
-          <Link to="/frontend-rocks/barbabraus/1">link alla pagina di dettaglio</Link>
-          <p className="text-center">
-            Modifica <code>src/App.tsx</code> e salva per testare l'hot reload
-          </p>
-
           
-        </div>
+        })}
       </div>
     </div>
   );
+};
+
+
+    
+
+export const Detail = () => {
+ return null
 }
