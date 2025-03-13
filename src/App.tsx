@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
  export const Detail = () => {
   const { id } = useParams();
@@ -37,11 +37,14 @@ export const App = () => {
               onClick={() => setTitle("MEGA barbara")}
           >
             Cambia
+            
           </button>
-
+          <Link to="/frontend-rocks/barbabraus/1">link alla pagina di dettaglio</Link>
           <p className="text-center">
             Modifica <code>src/App.tsx</code> e salva per testare l'hot reload
           </p>
+
+          
         </div>
       </div>
     </div>
